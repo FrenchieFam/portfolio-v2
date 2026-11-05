@@ -31,7 +31,7 @@ const t = data[lang as keyof typeof data];
 
 // Safely redirects if an invalid language is forced in the URL
 if (!t) {
-  return Astro.redirect('/en');
+  return Astro.redirect(`${import.meta.env.BASE_URL}en/`);
 }
 ---
 <Layout title={siteConfig.title}>

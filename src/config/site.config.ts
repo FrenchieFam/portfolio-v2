@@ -2,32 +2,32 @@
 
 export const siteConfig = {
   // Global Branding & SEO
-  author: "John Doe",         // Used in meta tags
-  title: "john@shellfolio:~$", // Browser tab title
-  description: "A highly performant, minimalist portfolio template built with Astro.js.",
-  siteUrl: "https://your-domain.com", // Used for OpenGraph
-  metaImage: "/og-image.png", // Placed in public/ directory
+  author: "Bryfry",         // Used in meta tags
+  title: "Frenchie Familia | Homelab & Automation", // Browser tab title
+  description: "Homelab engineering, automation, local AI, and creative workflows by Bryfry / Frenchie Familia.",
+  siteUrl: "https://frenchiefam.dev", // Used for OpenGraph
+  metaImage: "/og-preview.png", // Placed in public/ directory
 
   themeColor: "#4af626",
 
   // Custom Prompt
   prompt: {
-    user: "john",
-    host: "shellfolio",
+    user: "bryfry",
+    host: "frenchiefam",
   },
 
   // Feature Toggles (Enable/Disable sections)
   features: {
     fastfetch: true,
     about: true,
-    experiences: true,
+    experiences: false,
     projects: true,
-    education: true,
+    education: false,
     skills: true,
     remotes: true,
     contact: true,
     wallets: false,   	// Set to false by default for generic users
-    translations: true, // Set to false to disable the locale switcher and PT routing
+    translations: false, // Set to false to disable the locale switcher and PT routing
     torMirror: false, 	// Set to false by default for generic users
   },
 
@@ -36,41 +36,10 @@ export const siteConfig = {
 
   // Fastfetch ASCII Art (Use raw string template)
   asciiArt: `
-  		':;;:;;;;;;:;;;:::;
-             ,c:,'.............',;;;;;::;
-           .l,,.........................,c.
-         ,lc;'............................,;
-       c::;'...............................,c
-      :,''.......'''........................':'
-     :''....,coodddol:,......................';,
-     ;....:oxkkkkkkxxxdlc,....................';
-    .,..,okkOOOOOOkkkkxxxddol:;'....  .........,
-    ''.,dOOOOOOOOOOOkkkkxxxddolc::;,... .......'
-    .'.ckOOOOOOOOkkkkkkkxkxddoolcc:;;,'........'
-     :,dOOOOOOOOOkOkkkkkkkxxdoolcc::;;,.........
-      ckOxooolloodxkOOOOkdoc::;:::::;;;;,.......
-      co;,''..';;:ldxxxdl,...........',,;;.....
-      ldolcccc;;;codxdl:,....',,'''...',;;''...,
-     xkxoc;;;...';lxOxl'...,c,......''',;;;,'',::
-     xOkxxxll:;:coxkkdc,'';:c:;,,''',;;,;;;,,,,.,
-     l0OkkkxxddxxkOOxo:,,;:llllllclc::;;;;;,.','.
-     ;0OOOOOkkkkkOOOxoc;,;codxxxxdol::;;;;,,..'.
-      k0OOOOkxxkO00Odl:;:;,:odxxddol:;,,,,'''''
-      cOkkkxodxkxodd:,..'..':cooolc:,,,,'..,,,
-      ckxddlodxoc;;;'......',;::c:;,'''....,
-      ;oxd:'.',,....,,...........;,'.......
-      .;cl'..,:;:::cc:;,........ .........
-       '';,':xxxxxxdoolc;,,,;:;...........
-       ...'';dkxoc:,'''''',::;'......  ...
-       .....':okdlc;''',;;;,'...        ..
-        ......,;,,;,;,,''.....         ...
-         . ...............            ..,.
-          .....   .   .              ..',;
-           ..  .                   ...'',;;
-            :'..                 .....'',;:c.
-            dxl'...          ........''',,;;:c;,,.
-           .xkkkxol;,...............'''',,;;'.....;'
-         .;lOOOOkkxdlc:;;,''',,''''',,,,,'..    .....';
-      .,;,'xOOOkkkkxxdolc::cc::;;;;;;,..           .....',,
-    ,;'.''.oOOOkkkkxxdolccclccc::::,.              ........'.`
+  +-----------------------------+
+  |       F R E N C H I E       |
+  |        F A M I L I A        |
+  |                             |
+  |  homelab / automation / ai  |
+  +-----------------------------+`
 };

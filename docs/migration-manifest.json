@@ -1,0 +1,134 @@
+{
+  "sourceRepository": "https://github.com/frenchiefam/frenchiefam.github.io",
+  "sourceCommit": "a65b44c88960fca93168c550d58c84e4e90c02ff",
+  "files": [
+    {
+      "path": "case-study.html",
+      "sha256": "db31dd22a12fbecda5af5d2e7145c1d9c37dbf163e3ffe167b38be484143fd95",
+      "bytes": 13024
+    },
+    {
+      "path": "favicon.svg",
+      "sha256": "11804698cc8cccd577ec3f034dc47b97436f68ea924690a5762ec46ea4dfca5e",
+      "bytes": 253
+    },
+    {
+      "path": "index.html",
+      "sha256": "2f1ea0e90a3fa8285b4bb4791f0082ebc2e4ccdd4a4e938b79cd755ad83d25d5",
+      "bytes": 14327
+    },
+    {
+      "path": "manifest.json",
+      "sha256": "d2cf3f2fb46ad36c2a7b738b13f4d48787134d0ca10c1e185734dc5c07ca4c1a",
+      "bytes": 378
+    },
+    {
+      "path": "og-preview.png",
+      "sha256": "ac19fae450f0458c52f9dba9225d2535e9a4d8916e0cfb4d59fa76cdf8ceb926",
+      "bytes": 19493
+    },
+    {
+      "path": "style.css",
+      "sha256": "57225ef654ea41aff19a7e2b03b097b83a9098a94b2ef0ae65cf786b0d8fb4e2",
+      "bytes": 19833
+    },
+    {
+      "path": "automation/index.html",
+      "sha256": "03db6c4e44b6cdcaca16a1e7a485f59484d83198dac0928a8ff501e7f0b8353b",
+      "bytes": 8628
+    },
+    {
+      "path": "case-study-vram/index.html",
+      "sha256": "01c7094fbaacb9424824281bebe64400932b7ba72c5ed2bef30ba2b39cd71e19",
+      "bytes": 15757
+    },
+    {
+      "path": "process/index.html",
+      "sha256": "07db886e2d99a2c73d71ece3e09c86baeff69399bc2b897afd401be5d2204d59",
+      "bytes": 7642
+    },
+    {
+      "path": "samples/sample-1-poster.jpg",
+      "sha256": "98b9b7e213cd571e44cfcee1d5884da9b4af1b65e926c6b72a5310fafc91747a",
+      "bytes": 64318
+    },
+    {
+      "path": "samples/sample-1.mp4",
+      "sha256": "fdbf249684cbdb9b8a2e1da1b51736e2e928e08b74565988e78bd649996c6c12",
+      "bytes": 2625144
+    },
+    {
+      "path": "samples/sample-1.vtt",
+      "sha256": "7040f974cb3e8383661cae983ab6a851197fc52ac3315007804722ad1139b55a",
+      "bytes": 681
+    },
+    {
+      "path": "samples/sample-100mba.mp4",
+      "sha256": "3c6e639dc1f22c48a5eda064f3bd5b2e76d160dc045ecc38a8fe4d3faaa85557",
+      "bytes": 7063300
+    },
+    {
+      "path": "samples/sample-2-poster.jpg",
+      "sha256": "a34cdf7d5054e755f535e5d2a762b86fc61abe6c493ff16f03a172093fb9cedd",
+      "bytes": 79005
+    },
+    {
+      "path": "samples/sample-2.mp4",
+      "sha256": "ab033a0791825d3a79b9a7d2e7e7eae68467dce601acf9cc3b8ab05a9ac51038",
+      "bytes": 1943654
+    },
+    {
+      "path": "samples/sample-2.vtt",
+      "sha256": "f714d86f6a1be08ab5e74c7a0c9c65a33d3a871ef038001effaebf6c7616112a",
+      "bytes": 931
+    },
+    {
+      "path": "samples/sample-3-poster.jpg",
+      "sha256": "6cae9df2674f3716bd7934bfa246260e2be846a61f24d8967812b57eda526b96",
+      "bytes": 67014
+    },
+    {
+      "path": "samples/sample-3.mp4",
+      "sha256": "f367c1c75cf82c3f183b1fc2d58dd69d88eba8d3487af58b7d7d9d7985f2534d",
+      "bytes": 1969647
+    },
+    {
+      "path": "samples/sample-3.vtt",
+      "sha256": "0d65e3a8f4680502cc28cf5bfd2e5ce7f3911c70990e4e9efc0b74752c3f6506",
+      "bytes": 727
+    },
+    {
+      "path": "samples/sample-adhd.mp4",
+      "sha256": "50bc016450bb5dd13c9b7706ccc0eac9837c1a2a1177c5082ae9327fa9b74286",
+      "bytes": 3782237
+    },
+    {
+      "path": "samples/sample-anxious.mp4",
+      "sha256": "d6c249c47ccfe96746d382d0b23c89c5561b4c3829d3632f48297e0b2f427681",
+      "bytes": 749005
+    },
+    {
+      "path": "samples/sample-butterly.mp4",
+      "sha256": "b94e96c80d31eee10d0636fd287c5f06ab2af89e6a9f9e37410c2f81421794f0",
+      "bytes": 3549147
+    },
+    {
+      "path": "samples/sample-redweb.mp4",
+      "sha256": "7f26edde5202ca6484a442fae2ea1f5ba88440d308516247249885a57e48207d",
+      "bytes": 2237634
+    },
+    {
+      "path": "samples/sample-stuffisland.mp4",
+      "sha256": "47bb27ce6f2aeb13065b325a583d284726ac9e3b5561078aa4aac2c1ca93b0c8",
+      "bytes": 6890294
+    }
+  ],
+  "originalHomeLinks": [
+    "https://bryfryugc.gumroad.com/l/first-three-clients",
+    "https://frenchiefam.dev/gutierrez-handyman-booking/",
+    "https://www.fiverr.com/",
+    "https://www.fiverr.com/s/K334ZWW",
+    "mailto:frenchiefamdigital@gmail.com?subject=Free%20GBP%20Audit%20Request"
+  ],
+  "bio": "I edit podcasts into short-form clips that keep people watching. I run a local-first pipeline (Whisper + Ollama) so nothing leaves my machine, and I hand-check every hook so the first 3 seconds actually earn the scroll. Based in the US, working with podcasters worldwide."
+}

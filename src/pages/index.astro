@@ -15,15 +15,15 @@ import { siteConfig } from '../config/site.config';
   <meta property="og:url" content={siteConfig.siteUrl} />
   <meta property="og:title" content={siteConfig.title} />
   <meta property="og:description" content={siteConfig.description} />
-  <meta property="og:image" content={siteConfig.metaImage} />
+  <meta property="og:image" content={new URL(`${import.meta.env.BASE_URL}${siteConfig.metaImage.slice(1)}`, siteConfig.siteUrl).href} />
 
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:url" content={siteConfig.siteUrl} />
   <meta name="twitter:title" content={siteConfig.title} />
   <meta name="twitter:description" content={siteConfig.description} />
-  <meta name="twitter:image" content={siteConfig.metaImage} />
+  <meta name="twitter:image" content={new URL(`${import.meta.env.BASE_URL}${siteConfig.metaImage.slice(1)}`, siteConfig.siteUrl).href} />
 
-  <meta http-equiv="refresh" content="0;url=/en/" />
+  <meta http-equiv="refresh" content={`0;url=${import.meta.env.BASE_URL}en/`} />
 
   <style>
     body { background-color: #000000; }

@@ -1,192 +1,61 @@
-# 🖥️ shellfolio
+# Frenchie Familia - Shellfolio portfolio
 
-A portfolio template that looks like a running Linux system.
+## Purpose
+A separate Astro/Shellfolio portfolio for Bryfry / Frenchie Familia. The existing frenchiefam.github.io repository and frenchiefam.dev deployment are unchanged.
 
-<p align="center">
-  <a href="https://fajre.pages.dev">
-    <img src="https://i.imgur.com/9AvZEks.png" alt="shellfolio demo" width="100%">
-  </a>
-  <br>
-  <a href="https://fajre.pages.dev"><strong>Live Demo ➜</strong></a>
-</p>
+## Current State
+Customized local checkout of https://github.com/fajremvp/shellfolio (MIT license retained). Original content comes from https://github.com/frenchiefam/frenchiefam.github.io. Full original bio is retained; service descriptions, case studies, clip samples, contact links, and booking link are preserved under /legacy/ and linked from the new profile. See docs/content-migration.md and docs/migration-manifest.json.
 
-## ✨ Features
+Branding: Frenchie Familia | Homelab & Automation; author Bryfry; canonical site https://frenchiefam.dev; prompt bryfry@frenchiefam. Wallets, Portuguese switcher, and fictional template education/employment are disabled. The three requested homelab projects are included. Baddies is accurately marked paused, with imports/notifications described as separate integrations. Gitea is explicitly a private/tailnet link.
 
-- 🐧 **Authentic TUI Aesthetic:** A realistic `fastfetch` hero banner and `systemd`-inspired bootloader animation dynamically generated from your data.
-- ⚡ **Lightweight by default:** No JS framework, no CSS libraries. Built with Astro, vanilla CSS, and semantic HTML `<details>` elements for collapsible sections.
-- 🌍 **Bilingual Setup:** Out-of-the-box English and Portuguese configurations with simple static routing (can be disabled to run in English-only mode).
-- 🧩 **Modular & Type-Safe:** Enable or disable sections through `site.config.ts`. Portfolio data is validated with TypeScript interfaces.
-- ⌨️ **Accessible & Keyboard-Friendly:** Fully navigable via keyboard, with visible focus states, `prefers-reduced-motion` support, and OpenGraph metadata.
-- 🔑 **Privacy-Oriented Extras:** Optional crypto wallet QR codes and support for Tor Hidden Service deployments.
+## Local development
+Requires Node24 (or a version supported by the installed Astro release).
 
-## 📁 Project Structure
-
-```
-shellfolio/
-├── public/
-│   ├── assets/                         # Static assets (created by user)
-│   │   ├── qr-btc.webp                 # Bitcoin QR code (optional)
-│   │   └── qr-xmr.webp                 # Monero QR code (optional)
-│   ├── fonts/
-│   │   ├── Terminus.woff2
-│   │   └── VGA.woff2
-│   ├── favicon.svg
-│   └── og-image.png                    # OpenGraph preview image (created by user)
-├── src/
-│   ├── components/
-│   │   ├── sections/                   # One component per portfolio section
-│   │   │   ├── AboutSection.astro
-│   │   │   ├── ContactSection.astro
-│   │   │   ├── EducationSection.astro
-│   │   │   ├── ExperiencesSection.astro
-│   │   │   ├── LocaleSection.astro
-│   │   │   ├── ProjectsSection.astro
-│   │   │   ├── RemotesSection.astro
-│   │   │   ├── SkillsSection.astro
-│   │   │   ├── TorSection.astro
-│   │   │   └── WalletsSection.astro
-│   │   ├── AsciiFace.astro             # Renders the ASCII art from site.config.ts
-│   │   ├── BootLoader.astro            # Systemd-inspired boot animation
-│   │   ├── FastfetchHero.astro         # Hero banner (fastfetch simulation)
-│   │   └── Prompt.astro                # Reusable terminal prompt line
-│   ├── config/
-│   │   └── site.config.ts              # Global settings, feature flags, ASCII art
-│   ├── data/
-│   │   └── shellfolio.ts               # All portfolio content (typed, bilingual)
-│   ├── layouts/
-│   │   └── Layout.astro                # Base HTML shell with SEO meta tags
-│   ├── pages/
-│   │   ├── [lang]/
-│   │   │   └── index.astro             # Main page — sole consumer of shellfolio.ts
-│   │   └── index.astro                 # Root redirect (detects browser language)
-│   └── styles/
-│       └── global.css                  # CSS variables, TUI utility classes
-├── astro.config.mjs
-├── CONTRIBUTING.md
-├── .gitignore
-├── LICENSE
-├── package-lock.json
-├── package.json
-├── .pre-commit-config.yaml             # Gitleaks + pre-commit hygiene hooks
-├── README.md
-└── tsconfig.json
+```powershell
+Set-Location C:\homelab\05_Code\portfolio-shellfolio
+npm ci
+npm run dev -- --host 127.0.0.1
 ```
 
-## 🚀 Quick Start
+Open http://127.0.0.1:4321/en/. Build with `npm run build`, then run `npm run verify:migration`. `npm run preview -- --host 127.0.0.1` serves the built output.
 
-You can either use this repository as a GitHub template or create a new project directly from the CLI.
+## Push to a new empty repository
+Create an EMPTY GitHub repository named portfolio-v2 under frenchiefam. Do not initialize it with a README or license. The template remote is retained as upstream; origin is intentionally absent.
 
-**Option 1: The GitHub Way**
-
-Click the green **"Use this template"** button at the top right of this repository to create your own copy without the commit history.
-
-**Option 2: The CLI Way**
-
-If you prefer setting it up locally from scratch, run the Astro create command:
-```bash
-npm create astro@latest -- --template fajremvp/shellfolio
-cd shellfolio
-npm install
+```powershell
+git remote add origin https://github.com/frenchiefam/portfolio-v2.git
+git push -u origin main
 ```
 
-## ✏️ Files to Edit
+No force push is needed. No push or GitHub repository creation was performed during local setup.
 
-Most customization happens in the following files:
+## Safe GitHub Pages preview
+In the NEW repository, select Settings > Pages > Source: GitHub Actions. Run the manual Deploy portfolio preview workflow from Actions. It uses official withastro/action@v6 and actions/deploy-pages@v5 and sets PAGES_BASE_PATH=/portfolio-v2. Deployment is manual-only so pushing cannot publish unexpectedly. Use the URL reported by the Pages action (normally https://frenchiefam.github.io/portfolio-v2/; GitHub may inherit/redirect through the existing user-site custom domain).
 
-| File / Folder | Action | Purpose |
-|---|---|---|
-| `src/data/shellfolio.ts` | **Edit** | All your textual content: Fastfetch profile, experiences, projects, education, skills, contacts, and wallet addresses. |
-| `src/config/site.config.ts` | **Edit** | Global settings: Site title, URL, terminal prompt, theme color, feature toggles, onion address, and ASCII art. |
-| `public/favicon.svg` | **Add** | The browser tab icon. Optional: keep SVG as main favicon and include fallback `favicon.ico` (16x16, 32x32, 48x48) for maximum compatibility. |
-| `public/og-image.png` | **Add** | Screenshot of your finished portfolio for social media previews. Recommended size: 1200x630px. Recommended formats: `.png`. |
-| `public/assets/` | **Add** | Drop your crypto QR Code images here (e.g., `qr-btc.webp`, `qr-xmr.png`). Recommended formats: `.webp` or `.png`. Only needed if `wallets: true`. |
+The default astro.config.mjs site remains https://frenchiefam.dev as requested. PAGES_BASE_PATH provides the project-path preview; local builds use /. Fonts, template links and migrated project links account for this base.
 
-Everything else is internal implementation and does not need to be modified.
+## Future custom-domain cutover - separate approval required
+There is NO public/CNAME in this repo. Do not move the live domain now. Once the preview is approved:
+1. Verify the existing handyman booking project still resolves, and plan a compatible route if changing the parent custom-domain association would affect it.
+2. Coordinate removing frenchiefam.dev from the OLD Pages repository and assigning it to the NEW one; do not run two competing custom-domain deployments.
+3. Set the new deployment base to / by removing PAGES_BASE_PATH from deploy.yml. Keep Astro site https://frenchiefam.dev. Add public/CNAME containing frenchiefam.dev only at this cutover stage and update GitHub Pages custom-domain settings.
+4. Verify domain/DNS/TLS, all original legacy links, booking flow, and media before retiring the old deployment. Retain the old repo as a rollback source.
 
-> **Tip:** Want to see a fully configured example? Check out my personal shellfolio repository: [fajremvp/fajre-shellfolio](https://github.com/fajremvp/fajre-shellfolio).
+No DNS, live repo, custom-domain settings, or existing deployment was changed.
 
-### ⚙️ Customization Guide
+## Key files
+- src/config/site.config.ts: identity, terminal prompt, feature flags.
+- src/data/shellfolio.ts: bio, projects, skills, contacts.
+- public/legacy/: original pages/assets, preserved byte-for-byte.
+- docs/migration-manifest.json: original commit and SHA256 receipts.
+- .github/workflows/deploy.yml: manual project-path Pages preview.
+- astro.config.mjs: canonical domain and optional preview base.
+- scripts/verify-migration.mjs: content and build preservation checks.
+- .migration/: ignored local source checkout and template backups; not exported or committed.
 
-The following files control most of the site's content and behavior.
+## Next steps
+Review locally, create the new empty repo, push using the commands above, and enable/run its Pages workflow. Custom-domain cutover remains a later phase.
 
-#### 1. `src/config/site.config.ts` (Behavior & UI)
-This file controls the global settings, SEO, and which sections are rendered on the screen.
-
-- **Branding & SEO:** Update `author`, `title`, `description`, and `siteUrl` so link previews look correct when shared.
-- **Terminal Prompt:** Change the `user` and `host` to customize the green prompt string (e.g., `fajre@shellfolio`).
-- **Feature Toggles:** Enable or disable entire sections of the portfolio by flipping the booleans in the `features` object (e.g., set `wallets: false` to hide the crypto section).
-- **Single Language Mode:** Set `translations: false` to disable the Portuguese locale, keeping the site strictly in English and removing the language switcher.
-- **ASCII Art:** Replace the `asciiArt` template literal with your own text art.
-
-  > 💡 **Tip:** Want to generate ASCII art from a profile picture? Remove the background of a profile picture and use a tool like `jp2a` to convert it to ASCII:
-  > ```bash
-  > jp2a my-face-nobg.png
-  > ```
-
-#### 2. `src/data/shellfolio.ts` (Your Content)
-This file contains the content displayed throughout the portfolio. It is strictly typed with TypeScript interfaces to ensure you don't miss any required fields. Scroll down past the `// --- Data ---` to find the data you need to edit:
-
-* **Global Arrays (`contactLinks` & `paymentMethods`):** Update these lists with your own social handles, URLs, and crypto addresses.
-* **The `data` Object:** This contains your localized content. You will see two main blocks: `en` (English) and `pt` (Portuguese). If you set `translations: false` in your config, you can safely delete the entire `pt` block!
-* **Filling the fields:** Inside each language block, fill out your `profile`, `skills`, `experiences`, `projects`, and `education`.
-* **Line Breaks:** For long text blocks (like the `about` or `content` fields), you can use `\n` to force line breaks in the terminal output.
-
-#### 3. Run Locally
-Once your data is in place, start the development server to see your new portfolio live:
-```bash
-npm run dev
-```
-
-## 🌐 Deployment (Cloudflare Pages)
-
-Because shellfolio generates static files, it can be deployed directly to platforms such as Cloudflare Pages.
-
-**1. Push your code to a GitHub repository**
-
-**2. Create a new Pages project**
-
-Go to [Cloudflare Dashboard](https://dash.cloudflare.com/) → **Workers & Pages** → **Pages** → **Create application** → **Connect to Git** → authorize GitHub and select your repository.
-
-**3. Configure the build**
-
-| Field | Value |
-|---|---|
-| Project name | Your name or handle — this becomes your default URL: `yourname.pages.dev` |
-| Production branch | `main` |
-| Framework preset | `Astro` |
-| Build command | `npm run build` |
-| Build output directory | `dist` |
-
-**4. Set the Node.js version (Critical for Astro 4+)**
-
-Before deploying, go to **Settings → Environment variables** and add the following variable to both **Production** and **Preview**:
-
-| Variable | Value |
-|---|---|
-| `NODE_VERSION` | `22.12.0` |
-
-**5. Deploy**
-
-Click **Save and Deploy**. If the build log shows `Installing nodejs 22.12.0`, everything is correct. Your site will be live at `yourname.pages.dev`.
-
-**6. Custom domain (optional)**
-
-Go to **Custom Domains** → **Set up a custom domain**. Cloudflare handles DNS and SSL automatically.
-
-> After the initial setup, every push to `main` automatically triggers a new deployment.
-
-## 🔐 Self-Hosting & Tor / Nostr
-
-shellfolio can be self-hosted, including deployments on Tor Hidden Services.
-
-- **Tor Hidden Service:** If you enable `features: { torMirror: true }`, the template will automatically generate a `<section>` rendering the `cat /etc/tor/shellfolio/hostname` output.
-
-- **Nostr Identity (NIP-05):** While not a built-in feature of this template, because shellfolio is statically generated, you can easily use it to host and validate your Nostr identifier. See the official [NIP-05 specification](https://github.com/nostr-protocol/nips/blob/master/05.md) to learn how to map your Nostr keys to DNS-based internet identifiers.
-
-## 📜 Credits & License
-
-- **[Terminus Font](http://terminus-font.sourceforge.net/)** by Dimitar Zhekov, the monospace typeface used for prose and body text.
-- **[The Ultimate Oldschool PC Font Pack](https://int10h.org/oldschool-pc-fonts/)** by VileR, the authentic CRT/TUI typeface used for the VGA terminal elements.
-- **[Astro.js](https://astro.build/)**, the static site generator powering the build.
-
-Released under the [MIT License](./LICENSE).
+## Template and deployment references
+- https://github.com/fajremvp/shellfolio
+- https://docs.astro.build/en/guides/deploy/github/

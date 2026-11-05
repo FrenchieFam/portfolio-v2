@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="An 8 GB GPU, three local AI failures, and the memory budget that changed my podcast clipping pipeline. CUDA DLL fixes, VRAM contention, and orphaned model runners on Windows.">
+  <meta name="theme-color" content="#0f0f12">
+  <meta property="og:title" content="Running local AI on 8 GB of VRAM: what actually fits">
+  <meta property="og:description" content="Three failures, three fixes, and why the smallest model usually wins.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://frenchiefam.github.io/case-study-vram/">
+  <link rel="canonical" href="https://frenchiefam.github.io/case-study-vram/">
+  <title>Running local AI on 8 GB of VRAM: what actually fits | Bryan's Lab</title>
+  <link rel="stylesheet" href="../style.css">
+  <meta property="og:image" content="/og-preview.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Bryan's Lab: Podcast clipping &amp; custom AI workflows">
+  <meta name="twitter:image" content="/og-preview.png">
+  <meta name="twitter:card" content="summary_large_image">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header container">
+    <a class="wordmark" href="../index.html">Bryan's Lab<span class="wordmark-dot" aria-hidden="true">.</span></a>
+    <nav aria-label="Main navigation">
+      <a href="../index.html#services">Services</a>
+      <a href="../index.html#portfolio">Portfolio</a>
+      <a href="../case-study.html">Case study</a>
+      <a href="./" aria-current="page">VRAM study</a>
+      <a href="../automation/">AI workflows</a>
+      <a href="../process/">Process</a>
+      <a href="../index.html#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main id="main" tabindex="-1" class="container case-study">
+    <article aria-labelledby="case-study-title">
+      <header class="case-study-title">
+        <p class="eyebrow">Engineering / Case study 02</p>
+        <h1 id="case-study-title">Running local AI on 8 GB of VRAM: what actually fits</h1>
+        <p class="case-study-subtitle">Three failures, three fixes, and why the smallest model usually wins.</p>
+        <p class="case-study-meta">By Bryan's Lab · <time datetime="2026-10">October 2026</time> · 10 min read</p>
+      </header>
+
+      <section aria-labelledby="setup-title">
+        <h2 id="setup-title">The setup</h2>
+        <p>I wanted a full podcast clipping pipeline with zero cloud calls. Audio would become a transcript, a local LLM would pick highlight moments, and ffmpeg would reframe and render the selected clips. The hardware was an RTX 5060 Ti with 8 GB VRAM. Every stage had to work within that machine's resources.</p>
+        <p>The <a class="text-link" href="../case-study.html">first case study</a> covers the clipping pipeline and its delivery. This one is about getting the local AI stages to coexist. A model that loads successfully on its own can still leave too little memory for the next job. I found that out after fixing a dependency error and then watching the pipeline sit at 0%.</p>
+        <p>These are the readings and failures from my Windows debugging session. The memory estimates below are a planning budget for this workload, not a benchmark across every model configuration.</p>
+        <ul class="case-study-lessons">
+          <li>GPU: RTX 5060 Ti, 8 GB VRAM.</li>
+          <li>Transcription: faster-whisper through CTranslate2, initially using the small model.</li>
+          <li>Highlight selection: Ollama running <code>granite4.1:8b</code> at 16K context.</li>
+          <li>Reframing and rendering: ffmpeg, with AutoClip coordinating the job.</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="cuda-title">
+        <h2 id="cuda-title">Failure 1: CUDA DLL resolution</h2>
+        <div class="case-study-failure">
+          <dl>
+            <dt>Symptom</dt>
+            <dd>faster-whisper crashed with <code>Library cublas64_12.dll is not found or cannot be loaded</code>. Transcription never reached the point where model size mattered.</dd>
+            <dt>Root cause</dt>
+            <dd>CTranslate2 did not bundle the CUDA 12 runtime libraries this installation needed. The NVIDIA driver alone did not supply those DLLs. A working driver and a visible GPU were not enough to make the Python loader find cuBLAS.</dd>
+            <dt>Fix</dt>
+            <dd>I installed the CUDA wheels in the virtual environment, then copied their DLLs into CTranslate2's folder under <code>site-packages</code>, next to the loading binary.</dd>
+          </dl>
+          <pre aria-label="Install CUDA libraries in the active virtual environment"><code>uv pip install nvidia-cublas-cu12 nvidia-cuda-runtime-cu12</code></pre>
+          <p class="case-study-note">The copied files were <code>cublas64_12.dll</code>, <code>cublasLt64_12.dll</code>, and <code>cudart64_12.dll</code>.</p>
+        </div>
+        <p>On Linux, these libraries can be resolved through the configured linker path. Windows uses DLL search rules, and the wheel installation did not put the libraries where this loader could resolve them. Placing the DLLs adjacent to the loading binary fixed this environment. That is the workaround I used, not a claim that every Windows installation requires copying DLLs.</p>
+        <p>I would record the wheel versions and copied files with the environment. Otherwise, rebuilding the venv can bring back the same error even though the GPU driver has not changed. Fixing this lookup got transcription past startup. It did not create any more VRAM.</p>
+      </section>
+
+      <section aria-labelledby="collision-title">
+        <h2 id="collision-title">Failure 2: VRAM collision</h2>
+        <div class="case-study-failure">
+          <dl>
+            <dt>Symptom</dt>
+            <dd>The pipeline stalled at 0% for 6+ minutes. The GPU was pegged at 99%, but there was no progress. AutoClip eventually reported <code>Ollama timed out. Large transcripts on a small GPU can exceed the limit.</code></dd>
+            <dt>Root cause</dt>
+            <dd>With <code>granite4.1:8b</code> loaded at 16K context, <code>ollama ps</code> showed an 8.2 GB model and 24% CPU / 76% GPU spillover. <code>nvidia-smi</code> showed 7801 / 8151 MiB used, or 95% VRAM occupancy. faster-whisper small needed ~1.5 GB and the ffmpeg buffers in this workload needed ~1 GB. They could not fit in the remaining space.</dd>
+            <dt>Fix</dt>
+            <dd>Reduce the resident workload before retrying. The useful choices were a smaller LLM, a smaller context window, or a smaller transcription model. Repeating the same request against the same allocation would not change the budget.</dd>
+          </dl>
+          <pre aria-label="Commands used to inspect model placement and GPU memory"><code>ollama ps
+nvidia-smi</code></pre>
+        </div>
+        <p>The two readings describe different things. The 8.2 GB model figure from <code>ollama ps</code> includes a workload split across CPU and GPU. The 7801 / 8151 MiB reading describes occupied device memory. Neither says that 8.2 GB of model weights sat entirely on the card. Together, they show why loading the model was a poor test of whether the full pipeline would work.</p>
+        <p>Only 350 MiB remained in that device-memory reading. That was nowhere near the ~1.5 GB transcription allocation, before allowing for the ~1 GB of ffmpeg buffers. GPU utilization at 99% looked busy, but six minutes at 0% was the useful result. The workload had no room to proceed as configured.</p>
+        <p>The context window also costs memory. Keeping a larger KV cache lets the LLM retain more context during inference, but that allocation competes with everything else on the card. The model's parameter count and download size are not the whole runtime budget.</p>
+        <ol class="case-study-lessons">
+          <li>Swap to <code>qwen2.5:3b-instruct-q4_K_M</code>, at 1.9 GB. In this budget, the smaller model leaves ~4 GB headroom for the other stages and working memory. This is where I would start for highlight selection.</li>
+          <li>Reduce Ollama's context window from 16K to 4K. A smaller KV cache lowers the memory requirement while keeping the 8B model. The transcript still needs to fit the usable context alongside the prompt and response; longer episodes need smaller input passages.</li>
+          <li>Use the smallest Whisper model, tiny/base, instead of small. This reduces transcription's share of memory. Check the resulting transcript before relying on it to select and caption a clip.</li>
+        </ol>
+        <p>The task was "pick 3 highlight moments from a transcript." Starting with granite 8B at 16K context spent most of the GPU budget before I knew whether that size improved the selections. For this task, it was overkill. I would establish a usable result with the 3B model before giving a larger one more memory.</p>
+        <p>There is also a scheduling decision. Transcription, selection, and rendering happen in sequence, but their processes can keep allocations alive between stages. A sequential pipeline does not automatically have a sequential memory budget. Each handoff needs to release memory that the next stage requires.</p>
+      </section>
+
+      <section aria-labelledby="orphan-title">
+        <h2 id="orphan-title">Failure 3: Orphaned processes</h2>
+        <div class="case-study-failure">
+          <dl>
+            <dt>Symptom</dt>
+            <dd><code>ollama stop granite4.1:8b</code> returned successfully, but VRAM stayed at 7.8 GB. The unload command had finished. The allocation had not gone away.</dd>
+            <dt>Root cause</dt>
+            <dd>In this session, AutoClip died mid-request and left a <code>llama-server.exe</code> child process holding the model. The API response did not mean that the remaining worker had exited. That runner name and failure path describe this setup.</dd>
+            <dt>Fix</dt>
+            <dd>I identified the process holding the GPU allocation and killed the orphaned <code>llama-server.exe</code> directly with <code>Stop-Process</code>. Then I checked device memory again before starting another job.</dd>
+          </dl>
+          <pre aria-label="Find processes holding GPU memory"><code>nvidia-smi --query-compute-apps=pid,process_name,used_memory --format=csv</code></pre>
+          <p class="case-study-note">Use the PID belonging to the confirmed orphan, rather than terminating every model runner. In PowerShell, replace <code>&lt;orphan-PID&gt;</code> below with that process ID.</p>
+          <pre aria-label="Stop the identified orphan and verify memory release"><code>Stop-Process -Id &lt;orphan-PID&gt;
+nvidia-smi</code></pre>
+        </div>
+        <p>My rule after any cancelled AI job is to verify that VRAM returns to baseline before starting another. A closed client window and a successful stop response are not measurements of free memory. The GPU reading is what tells me whether the next run has room.</p>
+        <p>This also changes how I interpret a failed retry. If the previous worker is still resident, a new job is competing with an abandoned one. Until that allocation is gone, the retry cannot tell me whether the smaller model or context change solved the original problem.</p>
+      </section>
+
+      <section aria-labelledby="fits-title">
+        <h2 id="fits-title">What actually fits on 8 GB</h2>
+        <table class="vram-table">
+          <caption>Approximate model-stage VRAM budget for this setup. These estimates exclude the additional ~1 GB of ffmpeg buffers and other device allocations.</caption>
+          <thead><tr><th scope="col">Task</th><th scope="col">Model</th><th scope="col">VRAM</th><th scope="col">Fits?</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Transcription only</th><td>faster-whisper small</td><td>~1.5 GB</td><td>Yes</td></tr>
+            <tr><th scope="row">Transcription + 3B LLM</th><td>whisper small + qwen2.5:3b</td><td>~3.5 GB</td><td>Yes</td></tr>
+            <tr><th scope="row">Transcription + 8B LLM (4K ctx)</th><td>whisper small + granite4.1:8b</td><td>~6.8 GB</td><td>Tight but yes</td></tr>
+            <tr><th scope="row">Transcription + 8B LLM (16K ctx)</th><td>whisper small + granite4.1:8b</td><td>~9.7 GB</td><td>No</td></tr>
+          </tbody>
+        </table>
+        <p>"Tight but yes" applies to the model stages in the table. It is not a guarantee that the full pipeline fits with rendering buffers still resident. Quantization, context, transcription settings, and other GPU users change the peak. Leave space for the next stage instead of planning to consume every last MiB.</p>
+      </section>
+
+      <section aria-labelledby="lesson-title">
+        <h2 id="lesson-title">The architectural lesson</h2>
+        <p>"Running locally" means "managing resources like a 2010s sysadmin." I had to resolve DLLs, inspect memory, identify a worker process, and clean it up before the useful work could continue. Owning the hardware meant owning those handoffs too.</p>
+        <p>Cloud APIs hide the VRAM problem because I am paying for someone else's orchestration. Cloud brings rate limits and quotas; local execution brings memory management and process cleanup. Neither choice is wrong, but I want to know which tax I am paying before committing a workflow to it.</p>
+      </section>
+
+      <section aria-labelledby="differently-title">
+        <h2 id="differently-title">What I'd do differently</h2>
+        <ul class="case-study-lessons">
+          <li>Start with <code>qwen2.5:3b</code>, not 8B, on any GPU under 12 GB. The task of "pick 3 moments from a transcript" doesn't need 8B parameters as a starting requirement.</li>
+          <li>Pin CUDA wheel versions in the venv. Don't rely on system CUDA to supply the Python environment's runtime dependencies.</li>
+          <li>Check for and kill confirmed orphaned LLM processes before every run. Verify that VRAM has returned to baseline before loading another model.</li>
+          <li>Compress output video from the first clip, not after three uploads. Save the 6× bandwidth cost upfront. The first case study's sample went from approximately 15 MB to 2.5 MB; I would make that delivery pass part of the first export.</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="cloud-title">
+        <h2 id="cloud-title">When to use cloud instead</h2>
+        <p>If this workflow runs 20+ times a day, I would treat cloud as cheaper than my time managing VRAM. That is my operating rule, not a measured break-even price for every provider or transcript length. Local processing makes sense when keeping source material on the machine matters or when the workload fits comfortably. If repeated stalls and cleanup consume the day, I would pay for orchestration and spend that time reviewing the clips.</p>
+      </section>
+    </article>
+  </main>
+  <footer class="site-footer container case-study-footer">
+    <a href="../index.html">Back to Bryan's Lab</a>
+    <a href="../case-study.html">Podcast case study</a>
+    <a href="../automation/">AI workflows</a>
+    <a href="../process/">Process</a>
+    <a href="https://www.fiverr.com/s/K334ZWW">Fiverr <span aria-hidden="true">&nearr;</span></a>
+    <a href="https://bryfryugc.gumroad.com/l/first-three-clients">Gumroad <span aria-hidden="true">&nearr;</span></a>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "Bryan's Lab",
+  "short_name": "Bryan's Lab",
+  "description": "Podcast clipping & custom AI workflows",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f0f12",
+  "theme_color": "#0f0f12",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="An engineering account of a local-first podcast clipping pipeline: faster-whisper, Ollama, ffmpeg, Windows CUDA failures, VRAM limits, and a 6× smaller delivery file.">
+  <meta name="theme-color" content="#0f0f12">
+  <meta property="og:title" content="How I built a local-first podcast clipping pipeline">
+  <meta property="og:description" content="No cloud APIs, no footage uploads, 6× smaller delivery. Here's the stack and what broke.">
+  <link rel="canonical" href="https://frenchiefam.github.io/case-study.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://frenchiefam.github.io/case-study.html">
+  <title>Local-first podcast clipping pipeline | Bryan's Lab</title>
+  <link rel="stylesheet" href="style.css">
+  <meta property="og:image" content="/og-preview.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Bryan's Lab: Podcast clipping &amp; custom AI workflows">
+  <meta name="twitter:image" content="/og-preview.png">
+  <meta name="twitter:card" content="summary_large_image">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header container">
+    <a class="wordmark" href="index.html">Bryan's Lab<span class="wordmark-dot" aria-hidden="true">.</span></a>
+    <nav aria-label="Main navigation">
+      <a href="index.html#services">Services</a>
+      <a href="index.html#portfolio">Portfolio</a>
+      <a href="case-study.html" aria-current="page">Case study</a>
+      <a href="case-study-vram/">VRAM study</a>
+      <a href="automation/">AI workflows</a>
+      <a href="process/">Process</a>
+      <a href="index.html#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main id="main" tabindex="-1" class="container case-study">
+    <article aria-labelledby="case-study-title">
+      <header class="case-study-title">
+        <p class="eyebrow">Engineering / Case study</p>
+        <h1 id="case-study-title">How I built a local-first podcast clipping pipeline</h1>
+        <p class="case-study-subtitle">No cloud APIs, no footage uploads, 6× smaller delivery. Here's the stack and what broke.</p>
+        <p class="case-study-meta">By Bryan's Lab · <time datetime="2026-10">October 2026</time> · 8 min read</p>
+      </header>
+
+      <section aria-labelledby="problem-title">
+        <h2 id="problem-title">The problem</h2>
+        <p>A podcast episode can leave a production team with hours of footage and a much shorter deadline for social clips. Someone still has to find a passage that makes sense outside the episode, cut it cleanly, fit it into a vertical frame, and make the captions readable. A transcript helps with navigation. It doesn't decide whether the first sentence gives a stranger a reason to keep watching.</p>
+        <p>The hosted tools I was trying to replace put the entire source file on someone else's servers. A $15–30 monthly subscription was another recurring cost, but the upload requirement was the larger design constraint. A team handling unreleased episodes needs to account for where that material goes. Upload time also comes before any useful work can begin, and automated highlight selection still leaves the editorial decision to someone on the team.</p>
+        <p>I built the processing around local files instead. Transcription, highlight selection, and rendering run on my machine. After the models and runtime are installed, those stages can run offline without a per-request API bill. The tradeoff is explicit: I own the GPU budget, dependency failures, and final review. Publishing an approved sample is a separate step from processing the source footage.</p>
+      </section>
+
+      <section aria-labelledby="stack-title">
+        <h2 id="stack-title">The stack</h2>
+        <table class="case-study-stack">
+          <caption>Processing stages and why I chose them</caption>
+          <thead>
+            <tr><th scope="col">Stage</th><th scope="col">Tool</th><th scope="col">Reason</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Transcription</th>
+              <td>faster-whisper, local and CUDA-accelerated, with an approximately 1.5 GB model download.</td>
+              <td>Audio stays local. GPU inference avoids a remote transcription queue and usage-based API charges.</td>
+            </tr>
+            <tr>
+              <th scope="row">Highlight detection</th>
+              <td>Ollama with <code>granite4.1:8b</code>, or <code>qwen2.5:3b</code> for smaller GPUs.</td>
+              <td>A local LLM selects candidate passages from the transcript. Model size is a memory-budget choice, and selection can run offline.</td>
+            </tr>
+            <tr>
+              <th scope="row">Reframing + captions</th>
+              <td>ffmpeg + libass</td>
+              <td>Explicit crop, encoding, audio, and subtitle settings. The render doesn't depend on an upload or a browser editor.</td>
+            </tr>
+            <tr>
+              <th scope="row">Manual review</th>
+              <td>I watch every clip's first 3 seconds before it goes out.</td>
+              <td>The model proposes a passage. I decide whether the opening works as a clip and whether the cut needs revision.</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>The handoff between stages matters more than the model name. Transcription produces text and timestamps. Highlight selection works from that text; it does not need the original video uploaded to a multimodal service. ffmpeg then uses the selected interval to produce the vertical output and burn in the captions.</p>
+        <p>Local execution removes network transfer from the processing path, but it doesn't make latency disappear. Model loading, GPU contention, and encoding still take time. The approximately 1.5 GB model file is a disk footprint, not a promise about runtime VRAM. That distinction became important on an 8 GB card.</p>
+      </section>
+
+      <section aria-labelledby="failures-title">
+        <h2 id="failures-title">What broke</h2>
+        <p>These were the failures that changed the setup and the delivery. The fixes below describe this Windows environment and this sample, rather than a benchmark across machines.</p>
+
+        <article class="case-study-failure" aria-labelledby="cuda-title">
+          <h3 id="cuda-title">CUDA 12 DLL resolution on Windows</h3>
+          <dl>
+            <dt>Symptom</dt>
+            <dd>Transcription stopped with <code>cublas64_12.dll is not found</code> when the GPU path tried to load.</dd>
+            <dt>Root cause</dt>
+            <dd>CTranslate2 couldn't resolve the required CUDA 12 cuBLAS library in the Python environment. Having CUDA-related packages installed did not put every DLL where this loader expected it.</dd>
+            <dt>Fix</dt>
+            <dd>I copied the required DLLs from the <code>nvidia-cublas-cu12</code> wheel into CTranslate2's directory under the virtual environment's <code>site-packages</code>. That resolved the lookup in this installation. It is a local workaround that needs checking again after dependency updates.</dd>
+          </dl>
+        </article>
+
+        <article class="case-study-failure" aria-labelledby="vram-title">
+          <h3 id="vram-title">The 8 GB VRAM ceiling</h3>
+          <dl>
+            <dt>Symptom</dt>
+            <dd><code>granite4.1:8b</code> at a 16K context, with Whisper and the ffmpeg stage in the workload, hit an out-of-memory failure on an 8 GB GPU.</dd>
+            <dt>Root cause</dt>
+            <dd>The model weights were only part of the allocation. Context state and transcription buffers needed room too. The combined workload exceeded the available memory; an 8B model fitting on its own did not mean the pipeline would fit.</dd>
+            <dt>Fix</dt>
+            <dd>I used <code>qwen2.5:3b</code> for highlight selection to leave more headroom. Reducing the transcription batch size is another way to lower peak allocation. I would size the workload around the shared memory budget before increasing model size or context.</dd>
+          </dl>
+        </article>
+
+        <article class="case-study-failure" aria-labelledby="ollama-title">
+          <h3 id="ollama-title">Cancelling a request didn't free the GPU</h3>
+          <dl>
+            <dt>Symptom</dt>
+            <dd>After cancelling an Ollama request, VRAM stayed occupied and the next stage still lacked headroom.</dd>
+            <dt>Root cause</dt>
+            <dd>Request cancellation did not terminate the model runner in this session. The worker remained alive with its allocation. Stopping the caller was not sufficient to unload the model.</dd>
+            <dt>Fix</dt>
+            <dd>I had to manually terminate the lingering runner, identified as <code>llama-server.exe</code> in this setup, then confirm that VRAM had been released before restarting work. That process name is environment-specific; I would check the worker before terminating it.</dd>
+          </dl>
+        </article>
+
+        <article class="case-study-failure" aria-labelledby="size-title">
+          <h3 id="size-title">A 15 MB sample was slow on 4G</h3>
+          <dl>
+            <dt>Symptom</dt>
+            <dd>The clip on GitHub Pages took too long to load over a 4G connection. The MP4 was approximately 15 MB.</dd>
+            <dt>Root cause</dt>
+            <dd>I had carried a larger render into the web delivery step. Static hosting served the file as uploaded; there was no service generating a smaller playback version.</dd>
+            <dt>Fix</dt>
+            <dd>Re-encoding with <code>-crf 28 -vf scale=720:-2</code> brought this clip down to approximately 2.5 MB, a 6× reduction. The scale keeps the aspect ratio and calculates an even height for the encoder. This is the result for that sample; duration, motion, and audio bitrate affect other files.</dd>
+          </dl>
+          <pre aria-label="Sample web delivery encoding command"><code>ffmpeg -i clip.mp4 -c:v libx264 -crf 28 -vf scale=720:-2 -c:a aac -movflags +faststart clip-web.mp4</code></pre>
+          <p class="case-study-note">This pass assumes the crop, captions, and loudness processing are already in <code>clip.mp4</code>. <code>+faststart</code> moves MP4 metadata to the front so playback can start before the whole file downloads.</p>
+        </article>
+      </section>
+
+      <section aria-labelledby="delivery-title">
+        <h2 id="delivery-title">The delivery</h2>
+        <p>The output is a 9:16 vertical MP4 with H.264 video and burned captions rendered through libass. The captions travel with the picture, so playback doesn't depend on a separate subtitle track or player setting. Audio targets -14 LUFS integrated loudness through normalization, giving the export a defined loudness target. That target is separate from the video compression settings. I watch each clip's first 3 seconds before delivery, because a technically valid encode can still start mid-thought.</p>
+        <p>The compressed web sample is approximately 2.5 MB at 720 pixels wide, or 720 × 1280 for a 9:16 frame. The portfolio deployment on GitHub Pages uses static HTML and CSS plus one MP4 sample. It has no backend or database. The browser fetches the approved export directly, while the source footage, transcript, and inference stages stay on the local machine. The 6× reduction is a file-size comparison between the 15 MB and 2.5 MB versions of this sample, not a guaranteed reduction for every clip.</p>
+      </section>
+
+      <section aria-labelledby="lessons-title">
+        <h2 id="lessons-title">What I'd do differently</h2>
+        <ul class="case-study-lessons">
+          <li>Start with <code>qwen2.5:3b</code>, rather than an 8B model, on any GPU under 12 GB. Establish a working memory budget with transcription in the workload before trying a larger model.</li>
+          <li>Pin CUDA wheel versions in a virtual environment. Don't rely on system CUDA to resolve Python runtime dependencies, and record any DLL workaround alongside the pinned environment.</li>
+          <li>Compress the first clip for its actual delivery channel. Check the smaller export on a phone before repeating the upload cycle three times.</li>
+        </ul>
+      </section>
+    </article>
+  </main>
+
+  <footer class="site-footer container case-study-footer">
+    <a href="index.html">Back to Bryan's Lab</a>
+    <a href="automation/">AI workflows</a>
+    <a href="https://www.fiverr.com/s/K334ZWW">Fiverr <span aria-hidden="true">&nearr;</span></a>
+    <a href="case-study-vram/">Read next: Running local AI on 8 GB &rarr;</a>
+  </footer>
+</body>
+</html>

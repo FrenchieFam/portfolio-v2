@@ -70,114 +70,204 @@ export interface PortfolioData {
 }
 
 // --- Data ---
+const base = import.meta.env.BASE_URL;
+const localUrl = (url: string) => url.startsWith("/legacy/") ? `${base}${url.slice(1)}` : url;
 export const contactLinks = [
-  { protocol: "mailto", handle: "dev@johndoe.com", url: "mailto:dev@johndoe.com" },
-  { protocol: "github", handle: "johndoe", url: "https://github.com/johndoe" },
-  { protocol: "linkedin", handle: "in/johndoe", url: "https://linkedin.com/in/johndoe" }
-];
-
-export const paymentMethods = [
-  { name: "BTC", address: "bc1q...", qr: "/assets/qr-btc.webp" },
-  { name: "XMR", address: "85UM...", qr: "/assets/qr-xmr.webp" }
-];
-
-export const data: PortfolioData = {
-  en: {
-    profile: {
-      Name: "John Doe",
-      Online: "john",
-      Uptime: "25 years",
-      Location: "Earth",
-      Role: "Sysadmin & Developer",
-      Status: "Open to work",
-      OS: "Arch Linux x86_64",
-      Host: "ThinkPad T14",
-      Kernel: "Linux 6.6",
-      Shell: "zsh",
-      WM: "Hyprland",
-      about: `Hello, World! I am a software engineer and open-source enthusiast.\nI specialize in building minimal, fast, and secure tools for the modern web.`
-    },
-    experiences: [
-      {
-        perms: "drwxr-xr-x",
-        date: "2023-Pres",
-        company: "Open Source Corp",
-        folder: "Senior Developer",
-        content: `I worked as a lead developer on critical infrastructure projects.\n- I built highly scalable microservices.\n- I migrated legacy systems to cloud-native architectures.`
-      }
-    ],
-    projects: [
-      {
-        perms: "drwxr-xr-x", file: "shellfolio", link: "https://github.com/your-username/shellfolio",
-        content: `I built this minimalist TUI portfolio template using Astro.js.`
-      }
-    ],
-    education: [
-      {
-        perms: "drwxr-xr-x", date: "2018-2022", institution: "University of Technology", folder: "Computer Science",
-        content: "Bachelor of Science in Computer Science."
-      }
-    ],
-    skills: [
-      { category: "Languages", items: "TypeScript, Go, Rust, Python, Bash" },
-      { category: "Infra", items: "Docker, Kubernetes, Linux, Nginx, Ansible" }
-    ],
-    remotes: [
-      { name: "github", url: "git@github.com:johndoe/repo.git", webLink: "https://github.com/johndoe" }
-    ],
-    ui: {
-      repoLink: "Repository Link",
-      langEn: "[ English ]",
-      langPt: "[ Portuguese ]"
-    }
+  {
+    "protocol": "github",
+    "handle": "frenchiefam",
+    "url": "https://github.com/frenchiefam"
   },
-  pt: {
-    profile: {
-      Name: "John Doe",
-      Online: "john",
-      Uptime: "25 anos",
-      Location: "Terra",
-      Role: "Sysadmin & Desenvolvedor",
-      Status: "Disponivel",
-      OS: "Arch Linux x86_64",
-      Host: "ThinkPad T14",
-      Kernel: "Linux 6.6",
-      Shell: "zsh",
-      WM: "Hyprland",
-      about: `Olá, Mundo! Sou engenheiro de software e entusiasta open-source.\nEspecializado em criar ferramentas minimalistas e seguras.`
+  {
+    "protocol": "handyman",
+    "handle": "Book Gutierrez Handyman Co.",
+    "url": "https://frenchiefam.dev/gutierrez-handyman-booking/"
+  },
+  {
+    "protocol": "gitea",
+    "handle": "Private Gitea (tailnet access)",
+    "url": "http://100.81.148.117:3020"
+  },
+  {
+    "protocol": "link",
+    "handle": "First Three Clients on Gumroad",
+    "url": "https://bryfryugc.gumroad.com/l/first-three-clients"
+  },
+  {
+    "protocol": "link",
+    "handle": "Transcription services on Fiverr",
+    "url": "https://www.fiverr.com/"
+  },
+  {
+    "protocol": "link",
+    "handle": "Podcast clipping on Fiverr",
+    "url": "https://www.fiverr.com/s/K334ZWW"
+  },
+  {
+    "protocol": "email",
+    "handle": "Email FrenchieFam Digital",
+    "url": "mailto:frenchiefamdigital@gmail.com?subject=Free%20GBP%20Audit%20Request"
+  }
+];
+export const paymentMethods: { name: string; address: string; qr: string }[] = [];
+const english: LanguageData = {
+  "profile": {
+    "Name": "Bryfry / Frenchie Familia",
+    "Online": "bryfry",
+    "Uptime": "Always learning",
+    "Location": "United States",
+    "Role": "Homelab engineer, automation builder, and AI tinkerer",
+    "Status": "Building useful systems",
+    "OS": "Windows / Linux",
+    "Host": "Frenchie Familia Homelab",
+    "Kernel": "Containers + local AI",
+    "Shell": "PowerShell / Bash",
+    "WM": "Terminal-first",
+    "about": "Homelab engineer, automation builder, and AI tinkerer.\n\nI edit podcasts into short-form clips that keep people watching. I run a local-first pipeline (Whisper + Ollama) so nothing leaves my machine, and I hand-check every hook so the first 3 seconds actually earn the scroll. Based in the US, working with podcasters worldwide."
+  },
+  "experiences": [],
+  "projects": [
+    {
+      "perms": "drwxr-xr-x",
+      "file": "Media Automation Pipeline",
+      "link": "http://100.81.148.117:3020",
+      "content": "Fully automated media server with Seerr, Radarr/Sonarr, Prowlarr, qBittorrent (VPN-secured), and Jellyfin. Private homelab; the Gitea link requires tailnet access."
     },
-    experiences: [
-      {
-        perms: "drwxr-xr-x",
-        date: "2023-Pres",
-        company: "Open Source Corp",
-        folder: "Desenvolvedor Senior",
-        content: `Atuei como desenvolvedor líder em projetos críticos.\n- Construi microsserviços escaláveis.\n- Migrei sistemas legados para arquitetura em nuvem.`
-      }
-    ],
-    projects: [
-      {
-        perms: "drwxr-xr-x", file: "shellfolio", link: "https://github.com/your-username/shellfolio",
-        content: `Construí este template minimalista de portfólio TUI usando Astro.js.`
-      }
-    ],
-    education: [
-      {
-        perms: "drwxr-xr-x", date: "2018-2022", institution: "Universidade de Tecnologia", folder: "Ciencia da Computacao",
-        content: "Bacharelado em Ciência da Computação."
-      }
-    ],
-    skills: [
-      { category: "Linguagens", items: "TypeScript, Go, Rust, Python, Bash" },
-      { category: "Infra", items: "Docker, Kubernetes, Linux, Nginx, Ansible" }
-    ],
-    remotes: [
-      { name: "github", url: "git@github.com:johndoe/repo.git", webLink: "https://github.com/johndoe" }
-    ],
-    ui: {
-      repoLink: "Link do Repositório",
-      langEn: "[ Inglês ]",
-      langPt: "[ Português ]"
+    {
+      "perms": "drwxr-xr-x",
+      "file": "Local AI RAG System",
+      "link": "http://100.81.148.117:3020",
+      "content": "Private, uncensored AI research assistant using Ollama, Mythos-9B, and Open WebUI with a local knowledge base. Private homelab; the Gitea link requires tailnet access."
+    },
+    {
+      "perms": "drwxr-xr-x",
+      "file": "Baddies Downloader",
+      "link": "https://github.com/frenchiefam/portfolio-v2",
+      "content": "A Streamlit GUI that scrapes and downloads reality TV episodes. Paused (Stable), archived after polishing its UI. Automatic Sonarr import and push notifications are separate integrations, not features implemented by the GUI."
+    },
+    {
+      "perms": "drwxr-xr-x",
+      "file": "Podcast Clipping",
+      "link": "https://www.fiverr.com/s/K334ZWW",
+      "content": "01 Podcast Clipping Vertical 9:16 clips, burned captions, and human-checked hooks. $45 basic package"
+    },
+    {
+      "perms": "drwxr-xr-x",
+      "file": "Custom AI Workflows",
+      "link": "/legacy/automation/",
+      "content": "02 Custom AI Workflows Local Ollama + Codex pipelines for repetitive work. Discuss a workflow \u2192"
+    },
+    {
+      "perms": "drwxr-xr-x",
+      "file": "Digital Products",
+      "link": "https://bryfryugc.gumroad.com/l/first-three-clients",
+      "content": "03 Digital Products Prompt packs and templates you can put to work. Browse on Gumroad \u2192"
+    },
+    {
+      "perms": "drwxr-xr-x",
+      "file": "FrenchieFam Digital",
+      "link": "mailto:frenchiefamdigital@gmail.com?subject=Free%20GBP%20Audit%20Request",
+      "content": "Digital Services FrenchieFam Digital Bilingual Google Business Profile setup and Spanish/English transcription for local businesses. Bilingual GBP Setup Get found when customers search in Spanish. Free audit included. Get a Free Audit Spanish/English Transcription Accurate, fast transcription for audio and video. View Transcription Services"
+    },
+    {
+      "perms": "drwxr-xr-x",
+      "file": "Local-first Clipping Case Study",
+      "link": "/legacy/case-study.html",
+      "content": "Local-first podcast clipping pipeline. Original engineering case study, source details, and results preserved in full."
+    },
+    {
+      "perms": "drwxr-xr-x",
+      "file": "8 GB VRAM Case Study",
+      "link": "/legacy/case-study-vram/",
+      "content": "Running local AI on 8 GB of VRAM: what actually fits. Three failures, three fixes, and why the smallest model usually wins."
+    },
+    {
+      "perms": "drwxr-xr-x",
+      "file": "Clipping Process",
+      "link": "/legacy/process/",
+      "content": "02 / Process How It Works 01 Send me your video Drop a link to a podcast episode or upload a file. 02 I cut it, you approve I return 3\u20135 vertical clips in 48 hours. You pick which ones to keep. 03 You post, we iterate Your clips go live. Next round, I know your taste."
+    },
+    {
+      "perms": "drwxr-xr-x",
+      "file": "Complete Original Portfolio",
+      "link": "/legacy/",
+      "content": "All original portfolio text, service details, samples, case studies, and contact links preserved. Spec edits are uncommissioned portfolio samples. Source footage remains the property of the respective creators."
+    },
+    {
+      "perms": "drwxr-xr-x",
+      "file": "Podcast Spec \u2014 SmartLess",
+      "link": "/legacy/samples/sample-1.mp4",
+      "content": "Vertical podcast spec edit. Uncommissioned sample; source footage remains the property of its respective creators."
+    },
+    {
+      "perms": "drwxr-xr-x",
+      "file": "Podcast Spec \u2014 Tim Butterly's Show",
+      "link": "/legacy/samples/sample-butterly.mp4",
+      "content": "Vertical podcast spec edit. Uncommissioned sample; source footage remains the property of its respective creators."
+    },
+    {
+      "perms": "drwxr-xr-x",
+      "file": "Podcast Spec \u2014 The Anxious Truth",
+      "link": "/legacy/samples/sample-anxious.mp4",
+      "content": "Vertical podcast spec edit. Uncommissioned sample; source footage remains the property of its respective creators."
+    },
+    {
+      "perms": "drwxr-xr-x",
+      "file": "Podcast Spec \u2014 The $100 MBA Show",
+      "link": "/legacy/samples/sample-100mba.mp4",
+      "content": "Vertical podcast spec edit. Uncommissioned sample; source footage remains the property of its respective creators."
+    },
+    {
+      "perms": "drwxr-xr-x",
+      "file": "Podcast Spec \u2014 Stuff Island",
+      "link": "/legacy/samples/sample-stuffisland.mp4",
+      "content": "Vertical podcast spec edit. Uncommissioned sample; source footage remains the property of its respective creators."
+    },
+    {
+      "perms": "drwxr-xr-x",
+      "file": "Podcast Spec \u2014 Red Web",
+      "link": "/legacy/samples/sample-redweb.mp4",
+      "content": "Vertical podcast spec edit. Uncommissioned sample; source footage remains the property of its respective creators."
+    },
+    {
+      "perms": "drwxr-xr-x",
+      "file": "Podcast Spec \u2014 I Have ADHD",
+      "link": "/legacy/samples/sample-adhd.mp4",
+      "content": "Vertical podcast spec edit. Uncommissioned sample; source footage remains the property of its respective creators."
     }
+  ],
+  "education": [],
+  "skills": [
+    {
+      "category": "Infrastructure",
+      "items": "Docker, Linux, Tailscale"
+    },
+    {
+      "category": "Automation",
+      "items": "Python, n8n"
+    },
+    {
+      "category": "AI & Web",
+      "items": "Ollama, Astro"
+    }
+  ],
+  "remotes": [
+    {
+      "name": "github",
+      "url": "https://github.com/frenchiefam",
+      "webLink": "https://github.com/frenchiefam"
+    },
+    {
+      "name": "gitea (private tailnet)",
+      "url": "http://100.81.148.117:3020",
+      "webLink": "http://100.81.148.117:3020"
+    }
+  ],
+  "ui": {
+    "repoLink": "Open project or resource",
+    "langEn": "[ English ]",
+    "langPt": "[ Portuguese ]"
   }
 };
+english.projects = english.projects.map(project => ({ ...project, link: localUrl(project.link) }));
+export const data: PortfolioData = { en: english, pt: english };
