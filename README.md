@@ -4,9 +4,9 @@
 A separate Astro/Shellfolio portfolio for Bryfry / Frenchie Familia. The existing frenchiefam.github.io repository and frenchiefam.dev deployment are unchanged.
 
 ## Current State
-Customized local checkout of https://github.com/fajremvp/shellfolio (MIT license retained). Original content comes from https://github.com/frenchiefam/frenchiefam.github.io. Full original bio is retained; service descriptions, case studies, clip samples, contact links, and booking link are preserved under /legacy/ and linked from the new profile. See docs/content-migration.md and docs/migration-manifest.json.
+Customized local checkout of https://github.com/fajremvp/shellfolio (MIT license retained). Original content comes from https://github.com/frenchiefam/frenchiefam.github.io. Full original bio is retained in the legacy snapshot; the main page uses the updated user-provided bio; service descriptions, case studies, clip samples, contact links, and booking link are preserved under /legacy/. Current service cards link directly to Fiverr, email and Gumroad. See docs/content-migration.md and docs/migration-manifest.json.
 
-Branding: Frenchie Familia | Homelab & Automation; author Bryfry; canonical site https://frenchiefam.dev; prompt bryfry@frenchiefam. Wallets, Portuguese switcher, and fictional template education/employment are disabled. The three requested homelab projects are included. Baddies is accurately marked paused, with imports/notifications described as separate integrations. Gitea is explicitly a private/tailnet link.
+Branding: Frenchie Familia | Homelab & Automation; author Bryfry; canonical site https://frenchiefam.dev; prompt bryfry@frenchiefam. Wallets, Portuguese switcher, and fictional template education/employment are disabled. The three requested homelab projects are included. Baddies is accurately marked paused, with imports/notifications described as separate integrations. Gitea is shown as plain text (private tailnet); its IP and clickable endpoint are removed from the published profile.
 
 ## Local development
 Requires Node24 (or a version supported by the installed Astro release).
@@ -59,3 +59,9 @@ Review locally, create the new empty repo, push using the commands above, and en
 ## Template and deployment references
 - https://github.com/fajremvp/shellfolio
 - https://docs.astro.build/en/guides/deploy/github/
+
+## Latest local refinements
+The main page shows exactly four projects, a consolidated Podcast Clipping Pipeline, the exact revised bio, Since 2024 uptime, and an 80% terminal root font scale. Original material remains under /legacy/. Rebuild and run npm run verify:migration before previewing.
+
+## Services section
+The project and service sections reuse ProjectsSection.astro, with identical expandable terminal cards and global styles. The new typed services array provides Podcast Clipping (Fiverr), Custom AI Workflows (email), and Digital Products (Gumroad). Services renders directly after Projects with its own terminal prompt. Podcast Clipping Pipeline now opens the Fiverr gig instead of legacy content; original pages remain retained in public/legacy but are not linked by project cards.

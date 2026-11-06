@@ -9,7 +9,11 @@ const { remotes } = Astro.props;
     {remotes.map((remote: Remote) => (
        <>
          <span class="file">{remote.name}</span>
-         <a href={remote.webLink} target="_blank" rel="noopener noreferrer" class="hover-link" style="color: var(--text-muted); font-family: var(--font-prose); font-size: 1.15rem; word-break: break-all;">{remote.url} (fetch)</a>
+         {remote.webLink ? (
+           <a href={remote.webLink} target="_blank" rel="noopener noreferrer" class="hover-link" style="color: var(--text-muted); font-family: var(--font-prose); font-size: 1.15rem; word-break: break-all;">{remote.url} (fetch)</a>
+         ) : (
+           <span style="color: var(--text-muted); font-family: var(--font-prose); font-size: 1.15rem; word-break: break-all;">{remote.url}</span>
+         )}
        </>
     ))}
   </div>

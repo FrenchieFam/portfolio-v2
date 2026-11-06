@@ -22,6 +22,7 @@ export const siteConfig = {
     about: true,
     experiences: false,
     projects: true,
+    services: true,
     education: false,
     skills: true,
     remotes: true,

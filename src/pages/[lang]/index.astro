@@ -7,7 +7,7 @@ import Prompt from '../../components/Prompt.astro';
 import { siteConfig } from '../../config/site.config';
 
 // IMPORTANT: Index must be the ONLY file importing raw data!
-import { data, contactLinks, paymentMethods } from '../../data/shellfolio';
+import { data, contactLinks, paymentMethods, services } from '../../data/shellfolio';
 
 import AboutSection from '../../components/sections/AboutSection.astro';
 import ExperiencesSection from '../../components/sections/ExperiencesSection.astro';
@@ -45,6 +45,8 @@ if (!t) {
     {siteConfig.features.experiences && <ExperiencesSection experiences={t.experiences} />}
 
     {siteConfig.features.projects && <ProjectsSection projects={t.projects} repoLinkText={t.ui.repoLink} />}
+
+    {siteConfig.features.services && <ProjectsSection projects={services} repoLinkText="Get started" promptCmd="ls -l ~/Services/" sectionId="services" />}
 
     {siteConfig.features.education && <EducationSection education={t.education} />}
 

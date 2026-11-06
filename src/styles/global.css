@@ -29,6 +29,9 @@
   box-sizing: border-box;
 }
 
+/* Compact terminal scale: 80% of the browser default. */
+html { font-size: 80%; }
+
 body {
   background-color: var(--bg-base);
   color: var(--text-main);
